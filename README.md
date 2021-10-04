@@ -1,0 +1,2 @@
+# greekbot
+ Discord Music Bot
