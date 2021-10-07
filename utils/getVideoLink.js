@@ -104,9 +104,7 @@ const getVideoLink = async (query) => {
                                     thumbnail: info.thumbnail,
                                     resource: buffer
                                 });
-                            } catch(err) {
-                                continue;
-                            }
+                            } catch(err) { continue; }
                         }
                         resolve({
                             author: parseString(album.artists.map(u => u.name).join(', ')),
@@ -117,16 +115,43 @@ const getVideoLink = async (query) => {
                     });
                 }
             } else if (query.includes('soundcloud.com')) {
-                const stream = await soundcloud.download(query);
-                if (!stream) return;
-                const info = await soundcloud.getInfo(query);
-                return {
-                    url: info.uri,
-                    title: parseString(info.title),
-                    author: parseString(info.user.full_name),
-                    thumbnail: info.artwork_url,
-                    resource: stream,
-                    list: [],
+                if (soundcloud.isPlaylistURL(query)) {
+                    return new Promise(async(resolve, reject) => {
+                        const info = await soundcloud.getSetInfo(query);
+                        const resources = [];
+                        var i = 0;
+                        for await (const track of info.tracks) {
+                            if (++i > 5) break;
+                            try {
+                                const buffer = await soundcloud.download(track.permalink_url);
+                                resources.push({
+                                    url: track.permalink_url,
+                                    title: track.title,
+                                    author: track.user.full_name,
+                                    thumbnail: track.artwork_url,
+                                    resource: buffer
+                                });
+                            } catch(e) { continue; }
+                        }
+                        resolve({
+                            author: info.user.full_name,
+                            title: info.label_name,
+                            url: info.uri,
+                            list: resources
+                        });
+                    });
+                } else if (soundcloud.isValidUrl(query)) {
+                    const stream = await soundcloud.download(query);
+                    if (!stream) return;
+                    const info = await soundcloud.getInfo(query);
+                    return {
+                        url: info.permalink_url,
+                        title: parseString(info.title),
+                        author: parseString(info.user.full_name),
+                        thumbnail: info.artwork_url,
+                        resource: stream,
+                        list: [],
+                    }
                 }
             }
         }

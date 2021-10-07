@@ -119,18 +119,17 @@ module.exports = {
         }
         const embed = new MessageEmbed().setColor('GREEN');
         if (link.list.length) {
-            link.resource = link.list[0].resource;
-            link.author = link.list[0].author;
-            link.title = link.list[0].title;
-            link.url = link.list[0].url;
-            link.thumbnail = link.list[0].thumbnail;
+            const r = link.list.shift();
+            link.resource = r.resource;
+            link.author = r.author;
+            link.title = r.title;
+            link.url = r.url;
+            link.thumbnail = r.thumbnail;
             decorateEmbed(`Now Playing`, embed, link);
             var i = 0;
             for (const track of link.list) {
-                if (i === 0) continue;
-                ++i;
                 connection.queue.push(track);
-                embed.addField('Queued', `${i}. [${track.title}](${track.url})`, false);
+                embed.addField('Queued', `${++i}. [${track.title}](${track.url})`, false);
             }
         } else {
             decorateEmbed(`Now Playing`, embed, link);
