@@ -33,7 +33,7 @@ module.exports = {
         if (!args.length) {
             const embed = new MessageEmbed().setColor('RED');
             embed.setAuthor('Please enter a search query!');
-            embed.setDescription('You can enter the following:\n- A youtube search term\n- A youtube video link\n- A spotify link');
+            embed.setDescription('You can enter the following:\n- A youtube search term\n- A youtube video link\n- A spotify link\n- A soundcloud track link');
             return message.channel.send({ embeds: [embed] });
         }
         var connection = getVoiceConnection(guild.id);
@@ -43,6 +43,11 @@ module.exports = {
                 guildId: guild.id,
                 adapterCreator: guild.voiceAdapterCreator,
             });
+            if (!connection) {
+                const embed = new MessageEmbed().setColor('RED');
+                embed.setAuthor('I do not have permissions to join that voice channel!');
+                return message.channel.send({ embeds: [embed] });
+            }
             connection.player = createAudioPlayer();
             guild.me.voice.timer = setInterval(() => {
                 if (guild.me.voice.channel && guild.me.voice.channel.members.size === 1) {
@@ -59,7 +64,7 @@ module.exports = {
                 embed.setTitle('An error has occured while playing');
                 embed.setDescription('Probably internet bad.');
                 message.channel.send({ embeds: [embed] });
-                connection.player.stop(true);
+                // connection.player.stop(true);
             });
             connection.player.on('stateChange', (o, n) => {
                 if (o.status === AudioPlayerStatus.Playing && n.status === AudioPlayerStatus.Idle) {

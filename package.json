@@ -20,6 +20,7 @@
     "googleapis": "^86.1.0",
     "libsodium-wrappers": "^0.7.9",
     "node-fetch": "^2.6.1",
+    "soundcloud-downloader": "^1.0.0",
     "spdl-core": "^2.0.2",
     "spotify-it": "^1.2.1",
     "spotifydl-core": "^0.2.0",

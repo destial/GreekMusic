@@ -5,6 +5,7 @@ const spotify = new Spotify( {
     id: process.env.CLIENT_ID,
     secret: process.env.CLIENT_SECRET,
 });
+const soundcloud = require('soundcloud-downloader').default;
 const spdl = require('spdl-core').default;
 const ytdl = require('ytdl-core');
 const parseString = require('./parseString');
@@ -114,6 +115,18 @@ const getVideoLink = async (query) => {
                             list: resources
                         });
                     });
+                }
+            } else if (query.includes('soundcloud.com')) {
+                const stream = await soundcloud.download(query);
+                if (!stream) return;
+                const info = await soundcloud.getInfo(query);
+                return {
+                    url: info.uri,
+                    title: parseString(info.title),
+                    author: parseString(info.user.full_name),
+                    thumbnail: info.artwork_url,
+                    resource: stream,
+                    list: [],
                 }
             }
         }
