@@ -5,7 +5,7 @@ const spotify = new Spotify( {
     id: process.env.CLIENT_ID,
     secret: process.env.CLIENT_SECRET,
 });
-const soundcloud = require('soundcloud-downloader').default;
+const scdl = require('soundcloud-downloader').default;
 const spdl = require('spdl-core').default;
 const ytdl = require('ytdl-core');
 const parseString = require('./parseString');
@@ -115,15 +115,15 @@ const getVideoLink = async (query) => {
                     });
                 }
             } else if (query.includes('soundcloud.com')) {
-                if (soundcloud.isPlaylistURL(query)) {
+                if (scdl.isPlaylistURL(query)) {
                     return new Promise(async(resolve, reject) => {
-                        const info = await soundcloud.getSetInfo(query);
+                        const info = await scdl.getSetInfo(query);
                         const resources = [];
                         var i = 0;
                         for await (const track of info.tracks) {
                             if (++i > 5) break;
                             try {
-                                const buffer = await soundcloud.download(track.permalink_url);
+                                const buffer = await scdl.download(track.permalink_url);
                                 resources.push({
                                     url: track.permalink_url,
                                     title: track.title,
@@ -140,10 +140,10 @@ const getVideoLink = async (query) => {
                             list: resources
                         });
                     });
-                } else if (soundcloud.isValidUrl(query)) {
-                    const stream = await soundcloud.download(query);
+                } else if (scdl.isValidUrl(query)) {
+                    const stream = await scdl.download(query);
                     if (!stream) return;
-                    const info = await soundcloud.getInfo(query);
+                    const info = await scdl.getInfo(query);
                     return {
                         url: info.permalink_url,
                         title: parseString(info.title),
